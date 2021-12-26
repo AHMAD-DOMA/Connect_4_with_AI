@@ -48,7 +48,7 @@ class button():
         pygame.draw.rect(screen,(0,0,0),(self.x_pos-2,self.y_pos-2,self.width+4,self.height+4),0)
         pygame.draw.rect(screen,self.color,(self.x_pos,self.y_pos,self.width,self.height),0)
         if self.text!='':
-            font=pygame.font.SysFont('Algerian',48)
+            font=pygame.font.Font("RAVIE.TTF",41)
             text=font.render(self.text, 1, BLACK)
             screen.blit(text,(self.x_pos+(self.width/2-text.get_width()/2),self.y_pos+(self.height/2-text.get_height()/2)))
     def isover(self,pos):
@@ -74,8 +74,9 @@ RADIUS = int(SQUARESIZE/2 - 5)
 
 screen = pygame.display.set_mode(size)
 
-myfont = pygame.font.SysFont("Ravie", 75)
-myfont2 = pygame.font.SysFont("Ravie", 55)
+myfont = pygame.font.Font("RAVIE.TTF",75)
+
+myfont2 = pygame.font.Font("RAVIE.TTF",55)
 
 
 def create_board():
