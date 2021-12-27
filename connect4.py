@@ -25,13 +25,6 @@ SLICE_LEN = 4 #used for slicing the board to compute the Heuristics
 
 pygame.init()
 
-background = pygame.image.load('Untitled.jpg')#background loading
-icon = pygame.image.load('icon.jpg')#icon loading
-pygame.display.set_icon(icon)
-pygame.display.set_caption("Connect 4")#game name
-depth = 0 #depth of minimax ; to select the hardness
-hardness_selected = False # flag to know is the hardness selected or not
-hardness_level = 0 # 1-> easy 2->normal 3->Hard
 #button class
 class button():
     def __init__(self,color,x_pos,y_pos,width,height,text=''):
@@ -63,16 +56,23 @@ class button():
             time.sleep(0.1)
             return True
 
-SQUARESIZE = 100
+background = pygame.image.load('Untitled.jpg')#background loading
+icon = pygame.image.load('icon.jpg')#icon loading
+pygame.display.set_icon(icon)
+pygame.display.set_caption("Connect 4")#game name
+depth = 0 #depth of minimax ; to select the hardness
+hardness_selected = False # flag to know is the hardness selected or not
+hardness_level = 0 # 1-> easy 2->normal 3->Hard
 
-width = NUM_OF_COLUMNS * SQUARESIZE
-height = (NUM_OF_ROWS + 1) * SQUARESIZE
+Cell_size = 100
 
-size = (width, height)
+#each cell will have a 100 * 100 px
+width_of_screen = 700
+height_of_screen = 700
 
-RADIUS = int(SQUARESIZE/2 - 5)
+RADIUS = int(Cell_size / 2 - 5)
 
-screen = pygame.display.set_mode(size)
+screen = pygame.display.set_mode((width_of_screen, height_of_screen))
 
 myfont = pygame.font.Font("RAVIE.TTF",75)
 
@@ -90,22 +90,26 @@ def create_board():
     return np.flip(board,axis=0)
 
 def show_board(board, game_over):
+    screen.blit(background, (0, 100))
+    for col in range(NUM_OF_COLUMNS):
+        for row in range(NUM_OF_ROWS):
+            pygame.draw.circle(screen, BLACK, (int(col * Cell_size + Cell_size / 2), int(row * Cell_size + Cell_size + Cell_size / 2)), RADIUS)
+
+    pygame.display.update()
+
+def fill_board(board, game_over):
     if not game_over:
-        pygame.draw.rect(screen, GRAY, (0, 0, width, SQUARESIZE))
-    screen.blit(background, (0, SQUARESIZE))
-    for c in range(NUM_OF_COLUMNS):
-        for r in range(NUM_OF_ROWS):
-            pygame.draw.circle(screen, BLACK, (int(c * SQUARESIZE + SQUARESIZE / 2), int(r * SQUARESIZE + SQUARESIZE + SQUARESIZE / 2)), RADIUS)
+        pygame.draw.rect(screen, GRAY, (0, 0, width_of_screen, 100))
 
-    for c in range(NUM_OF_COLUMNS):
-        for r in range(NUM_OF_ROWS):
-            if board[r][c] == PLAYER_PIECE:
-                pygame.draw.circle(screen, Lite_Green, (int(c * SQUARESIZE + SQUARESIZE / 2), height - int(r * SQUARESIZE + SQUARESIZE / 2)), RADIUS)
-                pygame.draw.circle(screen, Green, (int(c * SQUARESIZE + SQUARESIZE / 2), height - int(r * SQUARESIZE + SQUARESIZE / 2)), RADIUS - 8)
+    for col in range(NUM_OF_COLUMNS):
+        for row in range(NUM_OF_ROWS):
+            if board[row][col] == PLAYER_PIECE:
+                pygame.draw.circle(screen, Lite_Green, (int(col * Cell_size + Cell_size / 2), height_of_screen - int(row * Cell_size + Cell_size / 2)), RADIUS)
+                pygame.draw.circle(screen, Green, (int(col * Cell_size + Cell_size / 2), height_of_screen - int(row * Cell_size + Cell_size / 2)), RADIUS - 8)
 
-            elif board[r][c] == AI_PIECE:
-                pygame.draw.circle(screen, Lite_Blue, (int(c * SQUARESIZE + SQUARESIZE / 2), height - int(r * SQUARESIZE + SQUARESIZE / 2)), RADIUS)
-                pygame.draw.circle(screen, Blue, (int(c * SQUARESIZE + SQUARESIZE / 2), height - int(r * SQUARESIZE + SQUARESIZE / 2)), RADIUS - 8)
+            elif board[row][col] == AI_PIECE:
+                pygame.draw.circle(screen, Lite_Blue, (int(col * Cell_size + Cell_size / 2), height_of_screen - int(row * Cell_size + Cell_size / 2)), RADIUS)
+                pygame.draw.circle(screen, Blue, (int(col * Cell_size + Cell_size / 2), height_of_screen - int(row * Cell_size + Cell_size / 2)), RADIUS - 8)
 
     pygame.display.update()
 
@@ -379,19 +383,19 @@ while True:
                     hardness_selected = True
                     continue
         if event.type == pygame.MOUSEMOTION and not game_over and hardness_selected:
-            pygame.draw.rect(screen, GRAY, (0,0, width, SQUARESIZE))
+            pygame.draw.rect(screen, GRAY, (0, 0, width_of_screen, 100))
             posx = event.pos[0]
             if turn == PLAYER_PIECE:
-                pygame.draw.circle(screen, Lite_Green, (posx, int(SQUARESIZE / 2)), RADIUS)
-                pygame.draw.circle(screen, Green, (posx, int(SQUARESIZE / 2)), RADIUS-8)
+                pygame.draw.circle(screen, Lite_Green, (posx, int(Cell_size / 2)), RADIUS)
+                pygame.draw.circle(screen, Green, (posx, int(Cell_size / 2)), RADIUS - 8)
         pygame.display.update()
 
         if event.type == pygame.MOUSEBUTTONDOWN and not game_over and hardness_selected:
-            pygame.draw.rect(screen, GRAY, (0,0, width, SQUARESIZE))
+            pygame.draw.rect(screen, GRAY, (0, 0, width_of_screen, 100))
             # Ask for Player 1 Input
             if turn == PLAYER_PIECE:
                 posx = event.pos[0]
-                col = int(math.floor(posx/SQUARESIZE))
+                col = int(math.floor(posx / Cell_size))
                 if is_available_col(board, col):
                     row = get_next_open_row(board, col)
                     drop_piece(board, row, col, PLAYER_PIECE)
@@ -408,7 +412,7 @@ while True:
 
                     turn = AI_PIECE
 
-                    show_board(board, game_over)
+                    fill_board(board, game_over)
         if event.type == pygame.QUIT:
             sys.exit()
 
@@ -432,6 +436,6 @@ while True:
                 screen.blit(label, (100,30))
                 game_over = True
 
-            show_board(board, game_over)
+            fill_board(board, game_over)
 
             turn = PLAYER_PIECE
